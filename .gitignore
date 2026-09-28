@@ -1,0 +1,17 @@
+# dependencies
+node_modules/
+
+# Rust / Tauri build output (exe, installers, dev data)
+src-tauri/target/
+src-tauri/gen/schemas/
+
+# app data, if the app is ever run from the project root
+/data/
+/themes/
+
+# OS and editor files
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini
+*.log
