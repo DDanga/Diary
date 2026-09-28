@@ -1,0 +1,13 @@
+{
+  "name": "diary",
+  "version": "1.10.1",
+  "description": "A cozy, fully offline journaling app for Windows",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "tauri": "tauri"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2"
+  }
+}

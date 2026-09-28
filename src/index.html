@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diary</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div id="shelf-screen" class="screen">
+  <header class="shelf-header">
+    <img src="assets/icons/logo.png" alt="" class="logo-img" onerror="this.style.display='none'">
+    <div>
+      <h1 data-i18n="myDiaries"></h1>
+      <p class="muted" id="shelf-date"></p>
+    </div>
+    <button class="btn btn-ghost" id="btn-memory" data-title-i18n="randomMemory">🎲</button>
+    <button class="btn btn-ghost" id="btn-lock">🔒</button>
+    <button class="btn btn-ghost" id="btn-lang"></button>
+    <button class="btn btn-ghost" id="btn-theme" data-title-i18n="themes">🎨</button>
+  </header>
+  <main class="shelf" id="shelf"></main>
+</div>
+
+<div id="book-screen" class="screen hidden">
+  <header class="book-header">
+    <button class="btn btn-ghost" id="btn-back" data-i18n="backToShelf"></button>
+    <div class="book-title-wrap">
+      <h2 id="book-title"></h2>
+      <p class="muted" id="book-subtitle"></p>
+    </div>
+    <div class="book-actions">
+      <button class="btn btn-ghost hidden" id="btn-today" data-i18n="backToEntry"></button>
+      <button class="btn btn-ghost" id="btn-rating-tab" data-title-i18n="ratingTab">🏆</button>
+      <button class="btn btn-ghost" id="btn-clips" data-title-i18n="allAttachments">🖇</button>
+      <button class="btn btn-ghost" id="btn-history" data-i18n="entriesBtn"></button>
+      <button class="btn btn-ghost" id="btn-edit" data-i18n="settingsBtn"></button>
+    </div>
+  </header>
+
+  <main class="page-wrap" id="page-today">
+    <div class="paper">
+      <div class="paper-date" id="paper-date"></div>
+      <div class="streak-row" id="streak-row"></div>
+
+      <div class="rating-row">
+        <button class="rating-btn" id="rating-btn">
+          <span class="rating-icon" id="rating-icon">★</span>
+          <span id="rating-label"></span>
+          <span class="rating-value" id="rating-value">—</span>
+        </button>
+        <button class="rating-btn" id="mood-btn">
+          <span data-i18n="mood"></span>
+          <span class="rating-value" id="mood-value">—</span>
+        </button>
+        <div class="rating-popover hidden" id="rating-popover"></div>
+        <div class="rating-popover mood-popover hidden" id="mood-popover"></div>
+      </div>
+
+      <div class="toolbar" id="toolbar">
+        <button class="tb" data-cmd="bold" title="Bold"><b>B</b></button>
+        <button class="tb" data-cmd="italic" title="Italic"><i>I</i></button>
+        <button class="tb" data-cmd="underline" title="Underline"><u>U</u></button>
+        <button class="tb" data-cmd="strikeThrough" title="Strikethrough"><s>S</s></button>
+        <span class="tb-sep"></span>
+        <select class="tb-select" id="tb-font">
+          <option value="" data-i18n="font"></option>
+        </select>
+        <select class="tb-select" id="tb-size">
+          <option value="" data-i18n="size"></option>
+          <option value="2" data-i18n="small"></option>
+          <option value="3" data-i18n="normal"></option>
+          <option value="4" data-i18n="large"></option>
+          <option value="5" data-i18n="huge"></option>
+        </select>
+        <input type="color" id="tb-color" class="tb-color" value="#3a3530">
+        <span class="tb-sep"></span>
+        <button class="tb" id="tb-symbols" title="Symbols">✦</button>
+        <button class="tb" id="tb-clear" title="Clear formatting">✕</button>
+      </div>
+
+      <div class="symbols-panel hidden" id="symbols-panel">
+        <div class="symbols-tabs" id="symbols-tabs"></div>
+        <div class="symbols-grid" id="symbols-grid"></div>
+      </div>
+
+      <div id="questions-list"></div>
+
+      <div class="attach-block">
+        <div class="attach-head">
+          <span class="q-text" data-i18n="attachments"></span>
+          <button class="btn btn-ghost" id="btn-attach" data-i18n="addImage"></button>
+          <input type="file" id="attach-input" accept="image/*" multiple hidden>
+        </div>
+        <div class="attach-grid" id="attach-grid"></div>
+      </div>
+
+      <div class="paper-footer">
+        <span class="save-status" id="save-status"></span>
+        <button class="btn btn-primary" id="btn-save" data-i18n="save"></button>
+      </div>
+    </div>
+  </main>
+
+  <main class="page-wrap hidden" id="page-history">
+    <div class="paper">
+      <div class="paper-date" data-i18n="allEntries"></div>
+      <div class="calendar" id="calendar">
+        <div class="cal-head">
+          <button class="cal-nav" id="cal-prev">‹</button>
+          <span class="cal-title" id="cal-title"></span>
+          <button class="cal-nav" id="cal-next">›</button>
+        </div>
+        <div class="cal-grid" id="cal-grid"></div>
+      </div>
+      <div id="history-list"></div>
+    </div>
+  </main>
+
+  <main class="page-wrap hidden" id="page-clips">
+    <div class="paper">
+      <div class="paper-date" data-i18n="allAttachmentsTitle"></div>
+      <div class="clips-grid" id="clips-grid"></div>
+    </div>
+  </main>
+
+  <main class="page-wrap hidden" id="page-rating">
+    <div class="paper">
+      <div class="paper-date" id="rating-page-title"></div>
+      <div class="chart-controls">
+        <div class="chart-mode">
+          <button class="btn btn-ghost" id="chart-month" data-i18n="chartMonth"></button>
+          <button class="btn btn-ghost" id="chart-year" data-i18n="chartYear"></button>
+        </div>
+        <div class="cal-head chart-nav">
+          <button class="cal-nav" id="chart-prev">‹</button>
+          <span class="cal-title" id="chart-title"></span>
+          <button class="cal-nav" id="chart-next">›</button>
+        </div>
+      </div>
+      <div class="chart-box" id="chart-box"></div>
+      <div id="rating-list"></div>
+    </div>
+  </main>
+
+  <main class="page-wrap hidden" id="page-dreams">
+    <div class="paper">
+      <div class="paper-date" data-i18n="dreamsTitle"></div>
+      <div class="dream-add">
+        <input type="text" id="dream-input" maxlength="300">
+        <button class="btn btn-primary" id="btn-add-dream" data-i18n="addDream"></button>
+      </div>
+      <div id="dreams-list"></div>
+    </div>
+  </main>
+
+  <main class="page-wrap hidden" id="page-letters">
+    <div class="paper">
+      <div class="paper-date" data-i18n="lettersTitle"></div>
+      <div class="letter-compose">
+        <input type="text" id="letter-subject" class="letter-subject">
+        <div class="editor letter-editor" id="letter-editor" contenteditable="true"></div>
+        <div class="letter-actions">
+          <div class="letter-date-label">
+            <span data-i18n="openOn"></span>
+            <button class="btn btn-ghost" id="letter-date-btn"></button>
+            <div class="dp-popover hidden" id="dp-popover">
+              <div class="cal-head">
+                <button class="cal-nav" id="dp-prev">‹</button>
+                <span class="cal-title" id="dp-title"></span>
+                <button class="cal-nav" id="dp-next">›</button>
+              </div>
+              <div class="cal-grid" id="dp-grid"></div>
+            </div>
+          </div>
+          <button class="btn btn-primary" id="btn-seal" data-i18n="seal"></button>
+        </div>
+      </div>
+      <div id="letters-list"></div>
+    </div>
+  </main>
+
+  <main class="page-wrap hidden" id="page-edit">
+    <div class="paper">
+      <div class="paper-date" data-i18n="diarySettings"></div>
+      <label class="field">
+        <span data-i18n="titleField"></span>
+        <input type="text" id="edit-title">
+      </label>
+      <label class="field">
+        <span data-i18n="subtitleField"></span>
+        <input type="text" id="edit-subtitle">
+      </label>
+      <div id="daily-fields">
+        <label class="field">
+          <span data-i18n="ratingLabelField"></span>
+          <input type="text" id="edit-rating-label">
+        </label>
+      </div>
+      <div class="field">
+        <span data-i18n="coverColor"></span>
+        <div class="color-row" id="color-row"></div>
+      </div>
+      <div class="field">
+        <span data-i18n="pinField"></span>
+        <div class="pin-row">
+          <button class="btn btn-ghost" id="btn-diary-pin"></button>
+          <button class="btn btn-danger" id="btn-diary-pin-remove" data-i18n="removePin"></button>
+        </div>
+      </div>
+      <div id="daily-fields-2">
+        <label class="field">
+          <span data-i18n="questionsField"></span>
+          <textarea id="edit-questions" rows="8"></textarea>
+        </label>
+      </div>
+      <div class="paper-footer">
+        <button class="btn btn-danger" id="btn-delete" data-i18n="deleteDiary"></button>
+        <button class="btn btn-primary" id="btn-save-edit" data-i18n="saveSettings"></button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div id="type-chooser" class="lightbox hidden">
+  <div class="type-panel">
+    <div class="paper-date" data-i18n="chooseType"></div>
+    <button class="type-option" data-type="daily">
+      <span class="type-icon">📖</span>
+      <span><b data-i18n="typeDaily"></b><br><small class="muted" data-i18n="typeDailyDesc"></small></span>
+    </button>
+    <button class="type-option" data-type="dreams">
+      <span class="type-icon">✨</span>
+      <span><b data-i18n="typeDreams"></b><br><small class="muted" data-i18n="typeDreamsDesc"></small></span>
+    </button>
+    <button class="type-option" data-type="letters">
+      <span class="type-icon">✉</span>
+      <span><b data-i18n="typeLetters"></b><br><small class="muted" data-i18n="typeLettersDesc"></small></span>
+    </button>
+  </div>
+</div>
+
+<div id="memory-overlay" class="lightbox hidden">
+  <div class="type-panel memory-panel">
+    <div class="memory-label" id="memory-label"></div>
+    <div class="memory-title" id="memory-title"></div>
+    <div class="memory-text" id="memory-text"></div>
+    <div class="modal-btns">
+      <button class="btn btn-ghost" id="memory-again" data-title-i18n="anotherMemory">🎲</button>
+      <button class="btn btn-primary" id="memory-open" data-i18n="openEntry"></button>
+    </div>
+  </div>
+</div>
+
+<div id="pin-screen" class="lightbox hidden">
+  <div class="type-panel pin-panel">
+    <div class="paper-date" id="pin-title"></div>
+    <div class="pin-dots" id="pin-dots"></div>
+    <div class="pin-pad" id="pin-pad"></div>
+    <button class="btn btn-ghost" id="pin-cancel" data-i18n="cancel"></button>
+  </div>
+</div>
+
+<div id="pin-menu" class="lightbox hidden">
+  <div class="type-panel">
+    <div class="paper-date" data-i18n="appLock"></div>
+    <button class="type-option" id="pin-menu-change"><span class="type-icon">🔑</span><b data-i18n="changePin"></b></button>
+    <button class="type-option" id="pin-menu-remove"><span class="type-icon">🗑</span><b data-i18n="removePin"></b></button>
+  </div>
+</div>
+
+<div id="modal" class="lightbox hidden">
+  <div class="type-panel modal-panel">
+    <div class="modal-msg" id="modal-msg"></div>
+    <input type="text" id="modal-input" class="modal-input hidden">
+    <div class="modal-btns">
+      <button class="btn btn-ghost" id="modal-cancel"></button>
+      <button class="btn btn-primary" id="modal-ok"></button>
+    </div>
+  </div>
+</div>
+
+<div id="lightbox" class="lightbox hidden">
+  <button class="lb-close" id="lb-close">✕</button>
+  <button class="lb-arrow lb-prev" id="lb-prev">‹</button>
+  <div class="lb-viewport">
+    <div class="lb-track" id="lb-track"></div>
+  </div>
+  <button class="lb-arrow lb-next" id="lb-next">›</button>
+</div>
+
+<div id="theme-overlay" class="lightbox hidden">
+  <div class="type-panel theme-panel">
+    <div class="theme-head">
+      <div class="paper-date" data-i18n="themes"></div>
+      <button class="btn btn-ghost" id="btn-import-theme" data-title-i18n="importTheme">+</button>
+    </div>
+    <div class="theme-grid" id="theme-grid"></div>
+    <input type="file" id="theme-file" accept=".json,application/json" hidden>
+  </div>
+</div>
+
+<div id="builder" class="lightbox hidden">
+  <div class="type-panel builder-panel">
+    <div class="paper-date" data-i18n="builderTitle"></div>
+    <div class="builder-scroll">
+      <div class="b-section" data-i18n="colorsSection"></div>
+      <div class="b-colors" id="b-colors"></div>
+      <div class="b-section" data-i18n="fontsSection"></div>
+      <label class="field"><span data-i18n="fontMain"></span><select class="b-select" id="b-font-main"></select></label>
+      <label class="field"><span data-i18n="fontDisplay"></span><select class="b-select" id="b-font-display"></select></label>
+      <div class="b-section" data-i18n="imagesSection"></div>
+      <div id="b-images"></div>
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-ghost" id="b-cancel" data-i18n="cancel"></button>
+      <button class="btn btn-primary" id="b-save" data-i18n="saveTheme"></button>
+    </div>
+    <input type="file" id="b-file" accept="image/*" hidden>
+  </div>
+</div>
+
+<div id="ctx-menu" class="ctx hidden"></div>
+<div id="print-area"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
